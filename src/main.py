@@ -46,8 +46,8 @@ def main() -> None:
                                               status=discord.Status.do_not_disturb,)
             return
         
-        discord_presence_title=f"{minecraft_server_status.players.online}/{minecraft_server_status.players.max} playing"    #default title
-        if 0<minecraft_server_status.players.online:                                                                        #if at least 1 player online: append player name list
+        discord_presence_title=f"{minecraft_server_status.players.online}/{minecraft_server_status.players.max}"    #default title
+        if 0<minecraft_server_status.players.online:                                                                #if at least 1 player online: append player name list
             discord_presence_title+=f": {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}"    #type:ignore
         await discord_bot.change_presence(activity=discord.Activity(name=discord_presence_title, type=discord.ActivityType.playing),
                                           status=discord.Status.online,)
