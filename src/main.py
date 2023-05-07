@@ -1,7 +1,7 @@
 #Copyright (c) 2023 구FS, all rights reserved. Subject to the MIT licence in `licence.md`.
 import aiohttp.client_exceptions
 import discord, discord.ext.commands, discord.ext.tasks
-import KFS.config, KFS.log
+import KFS.config, KFS.fstr, KFS.log
 import logging
 import mcstatus, mcstatus.pinger
 import time
@@ -38,17 +38,23 @@ def main() -> None:
         minecraft_server_status: mcstatus.pinger.PingResponse   #server status
         
 
+        logging.info(f"Fetching server status at \"{minecraft_server_ip}\"...")
         try:
             minecraft_server_status=minecraft_server.status()   #current server status
         except (IOError, TimeoutError):                         #if server currently transitioning between online offline or is currently offline:
+            logging.info(f"\rFetching server status at \"{minecraft_server_ip}\" failed. Server is assumed to be offline.")
             discord_presence_title="server offline"             #just say it's offline
             await discord_bot.change_presence(activity=discord.Activity(name=discord_presence_title, type=discord.ActivityType.playing),
                                               status=discord.Status.do_not_disturb,)
             return
+        logging.info(f"\rFetched server status at \"{minecraft_server_ip}\" with latency {KFS.fstr.notation_tech(minecraft_server_status.latency/1000, 2)}s. Server is online.")
+        
         
         discord_presence_title=f"{minecraft_server_status.players.online}/{minecraft_server_status.players.max}"    #default title
+        logging.info(f"Players online: {minecraft_server_status.players.online}/{minecraft_server_status.players.max}")
         if 0<minecraft_server_status.players.online:                                                                #if at least 1 player online: append player name list
             discord_presence_title+=f": {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}"    #type:ignore
+            logging.info(f"Player names: {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}")  #type:ignore
         await discord_bot.change_presence(activity=discord.Activity(name=discord_presence_title, type=discord.ActivityType.playing),
                                           status=discord.Status.online,)
         return
