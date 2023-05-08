@@ -35,28 +35,30 @@ def main() -> None:
         refresh bot display
         """
         discord_presence_title: str                             #presence, important information
+        discord_status: discord.Status                          #current status, online (green) for server online, do not disturb (red) for server offline
         minecraft_server_status: mcstatus.pinger.PingResponse   #server status
         
 
         logging.info(f"Fetching server status at \"{minecraft_server_ip}\"...")
         try:
-            minecraft_server_status=minecraft_server.status()   #current server status
-        except (IOError, TimeoutError):                         #if server currently transitioning between online offline or is currently offline:
+            minecraft_server_status=minecraft_server.status()       #current server status
+        except (IOError, TimeoutError):                             #if server currently transitioning between online offline or is currently offline:
             logging.info(f"\rFetching server status at \"{minecraft_server_ip}\" failed. Server is assumed to be offline.")
-            discord_presence_title="server offline"             #just say it's offline
-            await discord_bot.change_presence(activity=discord.Activity(name=discord_presence_title, type=discord.ActivityType.playing),
-                                              status=discord.Status.do_not_disturb,)
-            return
-        logging.info(f"\rFetched server status at \"{minecraft_server_ip}\" with latency {KFS.fstr.notation_tech(minecraft_server_status.latency/1000, 2)}s. Server is online.")
-        
-        
-        discord_presence_title=f"{minecraft_server_status.players.online}/{minecraft_server_status.players.max}"    #default title
-        logging.info(f"Players online: {minecraft_server_status.players.online}/{minecraft_server_status.players.max}")
-        if 0<minecraft_server_status.players.online:                                                                #if at least 1 player online: append player name list
-            discord_presence_title+=f": {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}"    #type:ignore
-            logging.info(f"Player names: {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}")  #type:ignore
-        await discord_bot.change_presence(activity=discord.Activity(name=discord_presence_title, type=discord.ActivityType.playing),
-                                          status=discord.Status.online,)
+            discord_presence_title="offline"                        #just say it's offline
+            discord_status=discord.Status.do_not_disturb            #status red
+        else:                                                                                                                           #if server online:
+            logging.info(f"\rFetched server status from \"{minecraft_server_ip}\" with latency {KFS.fstr.notation_tech(minecraft_server_status.latency/1000, 2)}s.")
+            discord_presence_title=f"{minecraft_server_status.players.online}/{minecraft_server_status.players.max}"                    #player numbers online
+            if 1<=minecraft_server_status.players.online:                                                                               #if at least 1 player online:
+                discord_presence_title+=f": {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}"    #append player name list #type:ignore
+            discord_status=discord.Status.online                                                                                        #status green
+        logging.info(f"Discord bot status: {discord_status}")
+        logging.info(f"Presence title: {discord_presence_title}")
+
+        logging.info(f"Applying presence title and bot status...")
+        await discord_bot.change_presence(activity=discord.Activity(name=discord_presence_title, type=discord.ActivityType.playing),    #apply presence
+                                          status=discord_status,)
+        logging.info(f"\rApplied presence title and bot status.")
         return
     
 
