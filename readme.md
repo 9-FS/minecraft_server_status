@@ -15,9 +15,9 @@ Author: "구FS"
 
 ## 1. General
 
-This bot reads a minecraft server IP from `minecraft_server_ip.config` and connects to the discord bot with token `discord_bot.token` to display the current status of the specified minecraft server via its rich presence title and bot status. It states whether the minecraft server is:
-- offline
-- online, current and maximum possible players online, and a player name list should there be any online
+This bot loads a minecraft server IP from `minecraft_server_ip.config`, connects to the discord bot with token `discord_bot.token`, and displays the current status of the specified minecraft server via its rich presence title and bot status. It states either:
+- offline, current global IP
+- current and maximum possible players online, a player name list should there be any online, current global IP
 
 ## 2. How to Install
 
@@ -31,7 +31,7 @@ As far as I know, there is currently no way of having rich presences on a per se
     1. Copy your token into `discord_bot.token`.
 
    If you don't know how to do these steps, I recommend [this tutorial](https://www.writebots.com/discord-bot-token/).
-1. Copy your minecraft server IP into `minecraft_server_ip.config`.
+1. Copy your minecraft server IP with port into `minecraft_server_ip.config`.
 1. Execute `main_outer.py` with python or execute the compiled `Metric METAR for Discord.exe`.
 
 <div style="page-break-after: always;"></div>
