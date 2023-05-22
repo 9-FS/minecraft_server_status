@@ -16,6 +16,7 @@ def main() -> None:
     discord_bot_token: str                  #discord bot token
     intents: discord.Intents                #bot permissions
     REFRESH_FREQUENCY: float=200e-3         #refresh display with 200mHz (every 5s)
+    TIMEOUT: int=50                         #internet connection timeout
     
     discord_bot_token=KFS.config.load_config("discord_bot.token")               #load discord bot token
     intents=discord.Intents.default()                                           #standard permissions
@@ -48,10 +49,14 @@ def main() -> None:
         try:
             minecraft_server_ip_global=ipaddress.ip_address(socket.gethostbyname(minecraft_server_ip_user)) #convert to IP
         except socket.gaierror:
-            logging.error("Getting IP address information failed. Check the given domain/IP and the internet connection.")
+            logging.error(f"\rConverting configured IP \"{minecraft_server_ip_user}\" to global IP failed. Unable to get IP address information. Check the given domain/IP and the internet connection.")
             return
         if minecraft_server_ip_global.is_private==True:                                             #if not global IP:
-            minecraft_server_ip_global=ipaddress.ip_address(requests.get("https://ident.me/").text) #convert to global IP
+            try:
+                minecraft_server_ip_global=ipaddress.ip_address(requests.get("https://ident.me/", timeout=TIMEOUT).text)    #convert to global IP
+            except TimeoutError:
+                logging.error(f"\rConverting configured IP \"{minecraft_server_ip_user}\" to global IP timed out.")
+                return
         logging.info(f"\rConverted configured IP \"{minecraft_server_ip_user}\" to global IP \"{minecraft_server_ip_global.exploded}\".")
         try:
             minecraft_server_port=int(minecraft_server_ip_port[1])
