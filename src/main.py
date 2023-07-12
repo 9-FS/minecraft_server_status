@@ -78,7 +78,7 @@ def main() -> None:
             if 1<=minecraft_server_status.players.online:                                                                               #if at least 1 player online:
                 discord_presence_title+=f": {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}"    #append player name list #type:ignore
             discord_status=discord.Status.online                                                                                        #status green
-        discord_presence_title+=f"; IP: {minecraft_server_ip_global.exploded.upper()}:{minecraft_server_port}"
+        discord_presence_title+=f"; IP: {minecraft_server_ip_global.exploded.upper()} :{minecraft_server_port}"                         #display, separate ip and port with space because IPv6 is so long and display needs a linebreak
         logging.info(f"Discord bot status: {discord_status}")
         logging.info(f"Presence title: {discord_presence_title}")
 
