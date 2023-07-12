@@ -57,7 +57,7 @@ def main() -> None:
             except TimeoutError:
                 logging.error(f"\rConverting configured IP \"{minecraft_server_ip_user}\" to global IP timed out.")
                 return
-        logging.info(f"\rConverted configured IP \"{minecraft_server_ip_user}\" to global IP \"{minecraft_server_ip_global.exploded}\".")
+        logging.info(f"\rConverted configured IP \"{minecraft_server_ip_user}\" to global IP \"{minecraft_server_ip_global.exploded.upper()}\".")
         try:
             minecraft_server_port=int(minecraft_server_ip_port[1])
         except ValueError:
@@ -78,7 +78,7 @@ def main() -> None:
             if 1<=minecraft_server_status.players.online:                                                                               #if at least 1 player online:
                 discord_presence_title+=f": {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}"    #append player name list #type:ignore
             discord_status=discord.Status.online                                                                                        #status green
-        discord_presence_title+=f"; IP: {minecraft_server_ip_global}:{minecraft_server_port}"
+        discord_presence_title+=f"; IP: {minecraft_server_ip_global.exploded.upper()}:{minecraft_server_port}"
         logging.info(f"Discord bot status: {discord_status}")
         logging.info(f"Presence title: {discord_presence_title}")
 
