@@ -38,13 +38,24 @@ def convert_to_ip_global(ip_or_domain: str) -> ipaddress.IPv4Address|ipaddress.I
         ip_global=ip_local_or_global
         return ip_global
 
+    logging.info(f"Converting local IP \"{ip_local_or_global.exploded.upper()}\" to global IPv4...")
+    try:
+        ip_global=ipaddress.ip_address(requests.get("https://4.ident.me/", timeout=TIMEOUT).text)   #try to convert to global IPv4 first
+    except TimeoutError:
+        logging.error(f"\rConverting local IP \"{ip_local_or_global.exploded.upper()}\" to global IPv4 timed out.")
+        raise
+    except ValueError:
+        logging.error(f"\rConverting local IP \"{ip_local_or_global.exploded.upper()}\" to global IPv4 failed with ValueError. Response from  https://4.ident.me/: \"{requests.get('https://4.ident.me/', timeout=TIMEOUT)}\" Network does not seem to have an IPv4.")
+    else:
+        logging.info(f"\rConverted local IP \"{ip_local_or_global.exploded.upper()}\" to global IPv4 \"{ip_global.exploded.upper()}\".")
+        return ip_global
+    
     logging.info(f"Converting local IP \"{ip_local_or_global.exploded.upper()}\" to global IP...")
     try:
-        ip_global=ipaddress.ip_address(requests.get("https://ident.me/", timeout=TIMEOUT).text) #convert to global IP
+        ip_global=ipaddress.ip_address(requests.get("https://ident.me/", timeout=TIMEOUT).text) #convert to global IP, don't care about IPv4 or IPv6
     except TimeoutError:
         logging.error(f"\rConverting local IP \"{ip_local_or_global.exploded.upper()}\" to global IP timed out.")
         raise
-    logging.info(f"\rConverted local IP \"{ip_local_or_global.exploded.upper()}\" to global IP \"{ip_global.exploded.upper()}\".")
-
-
-    return ip_global
+    else:
+        logging.info(f"\rConverted local IP \"{ip_local_or_global.exploded.upper()}\" to global IP \"{ip_global.exploded.upper()}\".")
+        return ip_global

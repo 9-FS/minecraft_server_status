@@ -1,6 +1,7 @@
 #Copyright (c) 2023 구FS, all rights reserved. Subject to the MIT licence in `licence.md`.
 import aiohttp.client_exceptions
 import discord, discord.ext.commands, discord.ext.tasks
+import inspect
 import ipaddress
 import KFS.config, KFS.fstr, KFS.log
 import logging
@@ -105,7 +106,14 @@ def main() -> None:
             logging.error(f"Converting given port \"{minecraft_server_ip_port[1]}\" to int failed.")
             return
 
-        message_send=f"[{minecraft_server_ip_global.exploded.upper()}]:{minecraft_server_port}"
+        match type(minecraft_server_ip_global): #depending on ip type: output formatting with brackets or without
+            case ipaddress.IPv4Address:
+                message_send=f"{minecraft_server_ip_global.exploded.upper()}:{minecraft_server_port}"
+            case ipaddress.IPv6Address:
+                message_send=f"[{minecraft_server_ip_global.exploded.upper()}]:{minecraft_server_port}"
+            case _:
+                logging.critical(f"minecraft_server_ip_global is of type \"{type(minecraft_server_ip_global)}\" instead of \"ipaddress.IPv4Address\" or \"ipaddress.IPv6Address\".")
+                raise RuntimeError(f"Error in {main.__name__}{inspect.signature(main)}: minecraft_server_ip_global is of type \"{type(minecraft_server_ip_global)}\" instead of \"ipaddress.IPv4Address\" or \"ipaddress.IPv6Address\".")
         logging.info(f"Sending message \"{message_send}\" to discord...")
         try:
             await discord_bot.get_channel(message.channel.id).send(message_send)    #send message to discord #type:ignore
