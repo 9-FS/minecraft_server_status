@@ -134,3 +134,6 @@ def main() -> None:
         except aiohttp.client_exceptions.ClientConnectorError:  # if temporary internet failure: retry connection
             logging.error("Starting discord bot failed, because bot could not connect. Retrying in 10s...")
             time.sleep(10)
+        except RuntimeError:
+            logging.error("Starting discord bot failed. Retrying in 10s...")
+            time.sleep(10)
