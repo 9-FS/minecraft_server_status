@@ -1,0 +1,22 @@
+[tool.poetry]
+authors     = ["9FS <pray4spam@googlemail.com>"]
+description = ""
+license     = "MIT"
+name        = "Minecraft Server Status for Discord"
+readme      = "readme.md"
+repository  = "https://github.com/9-FS/2023-05-07-Minecraft-Server-Status-for-Discord"
+version     = "1.0.0"
+
+[tool.poetry.dependencies]
+KFS      = "^1.0.0"
+aiohttp  = "^3.8.5"
+discord  = "^2.3.2"
+mcstatus = "^11.0.1"
+python   = "^3.11.0, <3.13"
+
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^5.13.2"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires      = ["poetry-core"]
