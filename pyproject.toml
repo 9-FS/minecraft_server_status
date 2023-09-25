@@ -5,7 +5,7 @@ license     = "MIT"
 name        = "x"
 readme      = "readme.md"
 repository  = "https://github.com/9-FS/2023-05-07-Minecraft-Server-Status-for-Discord"
-version     = "1.0.2"
+version     = "1.0.3"
 
 [tool.poetry.dependencies]
 aiohttp   = "^3.8.5"
@@ -15,6 +15,7 @@ kfsfstr   = "^1.0.1"
 kfslog    = "^1.0.0"
 mcstatus  = "^11.0.1"
 python    = "^3.11.0"
+requests  = "^2.31.0"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
