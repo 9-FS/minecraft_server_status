@@ -3,6 +3,10 @@
 *.log
 *.pyc
 *.token
-/doc_templates/
-/log/
-/src/test.py
+
+.hypothesis/
+.pytest_cache/
+doc_templates/
+log/
+
+tests/test.py
