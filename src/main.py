@@ -20,7 +20,10 @@ def main() -> None:
     intents: discord.Intents                # bot permissions
     REFRESH_FREQUENCY: float=200e-3         # refresh display with 200mHz (every 5s)
     
-    discord_bot_token=KFSconfig.load_config("discord_bot.token")               # load discord bot token
+    try:
+        discord_bot_token=KFSconfig.load_config("./config/discord_bot.token")   # load discord bot token
+    except FileNotFoundError:
+        return
     intents=discord.Intents.default()                                           # standard permissions
     intents.message_content=True                                                # in addition with message contents
     discord_bot=discord.ext.commands.Bot(command_prefix="", intents=intents)    # create bot instance
@@ -46,8 +49,11 @@ def main() -> None:
         minecraft_server_port: int                                              # target server port
         minecraft_server_status: mcstatus.pinger.PingResponse                   # server status
 
-
-        minecraft_server_ip_port=KFSconfig.load_config("minecraft_server_ip.config").rsplit(":", 1)    # load set server IP/domain and port, may be local or global
+        
+        try:
+            minecraft_server_ip_port=KFSconfig.load_config("./config/minecraft_server_ip.txt").rsplit(":", 1)   # load set server IP/domain and port, may be local or global
+        except FileNotFoundError:
+            return
         minecraft_server_ip_user=minecraft_server_ip_port[0]
         minecraft_server_ip_global=convert_to_ip_global(minecraft_server_ip_user)
         try:
@@ -99,7 +105,10 @@ def main() -> None:
             return
         logging.info("Executing IP command...")
 
-        minecraft_server_ip_port=KFSconfig.load_config("minecraft_server_ip.config").rsplit(":", 1)    # load set server IP/domain and port, may be local or global
+        try:
+            minecraft_server_ip_port=KFSconfig.load_config("./config/minecraft_server_ip.config").rsplit(":", 1)    # load set server IP/domain and port, may be local or global
+        except FileNotFoundError:
+            return
         minecraft_server_ip_user=minecraft_server_ip_port[0]
         minecraft_server_ip_global=convert_to_ip_global(minecraft_server_ip_user)
         try:
