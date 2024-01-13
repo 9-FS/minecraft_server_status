@@ -6,6 +6,7 @@
 .hypothesis/
 .pytest_cache/
 doc_templates/
+config/
 log/
 
 Dockerfile
