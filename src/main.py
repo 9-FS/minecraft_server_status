@@ -59,7 +59,7 @@ def main(DEBUG: bool) -> None:
         minecraft_server: mcstatus.JavaServer                                   # server instance
         minecraft_server_ip_port: str                                           # target server IP and if set port, may be IP or domain given or public IP
         minecraft_server_status: mcstatus.pinger.PingResponse                   # server status
-        LOOKUP_TIMEOUT: float=10                                                # timeout for server lookup in seconds
+        LOOKUP_TIMEOUT: float=5                                                 # timeout for server lookup in seconds
 
         
         logging.info("Refreshing presence...")
@@ -68,21 +68,28 @@ def main(DEBUG: bool) -> None:
             minecraft_server_ip_port+=f":{settings['minecraft_server_port']}"
 
         logging.info(f"Looking up \"{minecraft_server_ip_port}\"...")
-        minecraft_server=mcstatus.JavaServer.lookup(minecraft_server_ip_port, timeout=LOOKUP_TIMEOUT)                                   # lookup server with IP or domain given
-        logging.info(f"\rLooked up \"{minecraft_server_ip_port}\".")
-        logging.info(f"Fetching server status at \"{minecraft_server_ip_port}\"...")
         try:
-            minecraft_server_status=minecraft_server.status()                                                                           # current server status
-        except (IOError, TimeoutError):                                                                                                 # if server currently transitioning between online offline or is currently offline:
-            logging.info(f"\rFetching server status at \"{minecraft_server_ip_port}\" failed. Server is assumed to be offline.")
-            discord_presence_title="offline"                                                                                            # just say it's offline
-            discord_status=discord.Status.do_not_disturb                                                                                # status red
-        else:                                                                                                                           # if server online:
-            logging.info(f"\rFetched server status at \"{minecraft_server_ip_port}\" with latency {KFSfstr.notation_tech(minecraft_server_status.latency/1000, 2)}s.")
-            discord_presence_title=f"{minecraft_server_status.players.online}/{minecraft_server_status.players.max}"                    # player numbers online
-            if 1<=minecraft_server_status.players.online:                                                                               # if at least 1 player online:
-                discord_presence_title+=f": {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}"    # append player name list # type:ignore
-            discord_status=discord.Status.online                                                                                        # status green
+            minecraft_server=mcstatus.JavaServer.lookup(minecraft_server_ip_port, timeout=LOOKUP_TIMEOUT)           # lookup server with IP or domain given
+        except TimeoutError:
+            logging.info(f"\rLooking up \"{minecraft_server_ip_port}\" failed. Server is assumed to be offline.")
+            discord_presence_title="offline"                                                                        # just say it's offline
+            discord_status=discord.Status.do_not_disturb                                                            # status red
+        
+        else:
+            logging.info(f"\rLooked up \"{minecraft_server_ip_port}\".")
+            logging.info(f"Fetching server status at \"{minecraft_server_ip_port}\"...")
+            try:
+                minecraft_server_status=minecraft_server.status()                                                                           # current server status
+            except (IOError, TimeoutError):                                                                                                 # if server currently transitioning between online offline or is currently offline:
+                logging.info(f"\rFetching server status at \"{minecraft_server_ip_port}\" failed. Server is assumed to be offline.")
+                discord_presence_title="offline"                                                                                            # just say it's offline
+                discord_status=discord.Status.do_not_disturb                                                                                # status red
+            else:                                                                                                                           # if server online:
+                logging.info(f"\rFetched server status at \"{minecraft_server_ip_port}\" with latency {KFSfstr.notation_tech(minecraft_server_status.latency/1000, 2)}s.")
+                discord_presence_title=f"{minecraft_server_status.players.online}/{minecraft_server_status.players.max}"                    # player numbers online
+                if 1<=minecraft_server_status.players.online:                                                                               # if at least 1 player online:
+                    discord_presence_title+=f": {', '.join(sorted([player.name for player in minecraft_server_status.players.sample]))}"    # append player name list # type:ignore
+                discord_status=discord.Status.online                                                                                        # status green
         
 
         if settings["convert_to_ip_public"]==True:                          # if convert to public IP: convert
