@@ -57,6 +57,7 @@ def main(DEBUG: bool) -> None:
         discord_presence_title: str                                             # presence, important information
         discord_status: discord.Status                                          # current status, online (green) for server online, do not disturb (red) for server offline
         minecraft_server: mcstatus.JavaServer                                   # server instance
+        minecraft_server_display_ip_port: str                                   # server IP and if set port, may be IP or domain given or public IP
         minecraft_server_ip_port: str                                           # target server IP and if set port, may be IP or domain given or public IP
         minecraft_server_status: mcstatus.pinger.PingResponse                   # server status
         LOOKUP_TIMEOUT: float=5                                                 # timeout for server lookup in seconds
@@ -92,13 +93,13 @@ def main(DEBUG: bool) -> None:
                 discord_status=discord.Status.online                                                                                        # status green
         
 
-        if settings["convert_to_ip_public"]==True:                          # if convert to public IP: convert
-            minecraft_server_ip_port=convert_to_ip_public(settings["minecraft_server_ip"], settings["ip_public_version"])
-        else:                                                               # else: use given IP or domain
-            minecraft_server_ip_port=settings["minecraft_server_ip"]
-        if settings["minecraft_server_port"]!="":                           # if port given in settings:
-            minecraft_server_ip_port+=f":{settings['minecraft_server_port']}"
-        discord_presence_title+=f"; IP: {settings['minecraft_server_ip']}"  # append IP
+        if settings["convert_to_ip_public"]==True:                                      # if convert to public IP: convert
+            minecraft_server_display_ip_port=convert_to_ip_public(settings["minecraft_server_ip"], settings["ip_public_version"])
+        else:                                                                           # else: use given IP or domain
+            minecraft_server_display_ip_port=settings["minecraft_server_ip"]
+        if settings["minecraft_server_port"]!="":                                       # if port given in settings:
+            minecraft_server_display_ip_port+=f": {settings['minecraft_server_port']}"  # append port, space before port for linebreak
+        discord_presence_title+=f"; IP: {minecraft_server_display_ip_port}"             # append IP
 
         logging.info(f"Applying presence title \"{discord_presence_title}\" and bot status \"{discord_status.name}\"...")
         await discord_bot.change_presence(activity=discord.Activity(name=discord_presence_title, type=discord.ActivityType.playing),    # apply presence
