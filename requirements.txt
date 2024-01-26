@@ -7,7 +7,7 @@ charset-normalizer==3.3.2 ; python_full_version >= "3.11.0" and python_full_vers
 colorama==0.4.6 ; python_full_version >= "3.11.0" and python_full_version < "4.0.0"
 discord-py==2.3.2 ; python_full_version >= "3.11.0" and python_full_version < "4.0.0"
 discord==2.3.2 ; python_full_version >= "3.11.0" and python_full_version < "4.0.0"
-dnspython==2.4.2 ; python_full_version >= "3.11.0" and python_version < "4.0"
+dnspython==2.5.0 ; python_full_version >= "3.11.0" and python_version < "4"
 frozenlist==1.4.1 ; python_full_version >= "3.11.0" and python_full_version < "4.0.0"
 idna==3.6 ; python_full_version >= "3.11.0" and python_full_version < "4.0.0"
 kfsconfig==1.1.0 ; python_full_version >= "3.11.0" and python_full_version < "4.0.0"
