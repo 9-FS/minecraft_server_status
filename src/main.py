@@ -1,6 +1,7 @@
 # Copyright (c) 2023 구FS, all rights reserved. Subject to the MIT licence in `licence.md`.
 import aiohttp.client_exceptions
 import discord, discord.ext.commands, discord.ext.tasks
+import dns.exception
 import json
 from KFSconfig import KFSconfig
 from KFSfstr   import KFSfstr
@@ -54,13 +55,13 @@ def main(DEBUG: bool) -> None:
         Refreshes bot presence with current number of players online, maximum number of players, player names, and server IP. Also sets status to online or offline as appropiate.
         """
 
-        discord_presence_title: str                                             # presence, important information
-        discord_status: discord.Status                                          # current status, online (green) for server online, do not disturb (red) for server offline
-        minecraft_server: mcstatus.JavaServer                                   # server instance
-        minecraft_server_display_ip_port: str                                   # server IP and if set port, may be IP or domain given or public IP
-        minecraft_server_ip_port: str                                           # target server IP and if set port, may be IP or domain given or public IP
-        minecraft_server_status: mcstatus.pinger.PingResponse                   # server status
-        LOOKUP_TIMEOUT: float=5                                                 # timeout for server lookup in seconds
+        discord_presence_title: str                             # presence, important information
+        discord_status: discord.Status                          # current status, online (green) for server online, do not disturb (red) for server offline
+        minecraft_server: mcstatus.JavaServer                   # server instance
+        minecraft_server_display_ip_port: str                   # server IP and if set port, may be IP or domain given or public IP
+        minecraft_server_ip_port: str                           # target server IP and if set port, may be IP or domain given or public IP
+        minecraft_server_status: mcstatus.pinger.PingResponse   # server status
+        LOOKUP_TIMEOUT: float=5                                 # timeout for server lookup in seconds
 
         
         logging.info("Refreshing presence...")
@@ -70,11 +71,15 @@ def main(DEBUG: bool) -> None:
 
         logging.info(f"Looking up \"{minecraft_server_ip_port}\"...")
         try:
-            minecraft_server=mcstatus.JavaServer.lookup(minecraft_server_ip_port, timeout=LOOKUP_TIMEOUT)           # lookup server with IP or domain given
+            minecraft_server=mcstatus.JavaServer.lookup(minecraft_server_ip_port, timeout=LOOKUP_TIMEOUT)   # lookup server with IP or domain given
+        except dns.exception.Timeout:                                                                       # resolving DNS timed out, DNS server may have a failure
+            logging.info(f"\rLooking up DNS \"{minecraft_server_ip_port}\" timed out. Server status is unknown.")
+            discord_presence_title="unknown"                                                                # say it's unknown
+            discord_status=discord.Status.idle                                                              # status yellow
         except TimeoutError:
             logging.info(f"\rLooking up \"{minecraft_server_ip_port}\" failed. Server is assumed to be offline.")
-            discord_presence_title="offline"                                                                        # just say it's offline
-            discord_status=discord.Status.do_not_disturb                                                            # status red
+            discord_presence_title="offline"                                                                # just say it's offline
+            discord_status=discord.Status.do_not_disturb                                                    # status red
         
         else:
             logging.info(f"\rLooked up \"{minecraft_server_ip_port}\".")
@@ -102,9 +107,13 @@ def main(DEBUG: bool) -> None:
         discord_presence_title+=f"; IP: {minecraft_server_display_ip_port}"             # append IP
 
         logging.info(f"Applying presence title \"{discord_presence_title}\" and bot status \"{discord_status.name}\"...")
-        await discord_bot.change_presence(activity=discord.Activity(name=discord_presence_title, type=discord.ActivityType.playing),    # apply presence
-                                          status=discord_status,)
-        logging.info(f"\rApplied presence title \"{discord_presence_title}\" and bot status \"{discord_status.name}\".")
+        try:
+            await discord_bot.change_presence(activity=discord.Activity(name=discord_presence_title, type=discord.ActivityType.playing),    # apply presence
+                                            status=discord_status,)
+        except aiohttp.client_exceptions.ClientConnectorError as e:                                                                         # if internet connection fails
+            logging.error(f"\rApplying presence title \"{discord_presence_title}\" and bot status \"{discord_status.name}\" failed with {KFSfstr.full_class_name(e)}. Error: {e.args}")
+        else:
+            logging.info(f"\rApplied presence title \"{discord_presence_title}\" and bot status \"{discord_status.name}\".")
         return
     
 
@@ -135,9 +144,9 @@ def main(DEBUG: bool) -> None:
 
         logging.info(f"Sending message \"{message_send}\" to discord...")
         try:
-            await discord_bot.get_channel(message.channel.id).send(message_send)    # send message to discord # type:ignore
-        except (AttributeError, discord.errors.DiscordServerError) as e:            # get_channel already returned None, bot has probably been removed from server; send failed
-            logging.error(f"Sending message \"{message_send}\" to discord failed with with {KFSfstr.full_class_name(e)}. Error: {e.args}")
+            await discord_bot.get_channel(message.channel.id).send(message_send)                                            # send message to discord # type:ignore
+        except (aiohttp.client_exceptions.ClientConnectorError, AttributeError, discord.errors.DiscordServerError) as e:    # if internet connection fails; get_channel already returned None, bot has probably been removed from server; send failed
+            logging.error(f"Sending message \"{message_send}\" to discord failed with {KFSfstr.full_class_name(e)}. Error: {e.args}")
         else:
             logging.info(f"\rSent message \"{message_send}\" to discord.")
 
@@ -147,10 +156,7 @@ def main(DEBUG: bool) -> None:
     while True:
         logging.info("Starting discord bot...")
         try:
-            discord_bot.run(settings["discord_bot_token"])                  # start discord bot now
-        except aiohttp.client_exceptions.ClientConnectorError:  # if temporary internet failure: retry connection
-            logging.error("Starting discord bot failed, because bot could not connect. Retrying in 10s...")
-            time.sleep(10)
-        except RuntimeError:
-            logging.error("Starting discord bot failed. Retrying in 10s...")
+            discord_bot.run(settings["discord_bot_token"])                          # start discord bot now
+        except (aiohttp.client_exceptions.ClientConnectorError, RuntimeError) as e: # if internet connection fails: retry connection
+            logging.error(f"Starting discord bot failed with {KFSfstr.full_class_name(e)}. Error: {e.args}\nRetrying in 10s...")
             time.sleep(10)
