@@ -64,7 +64,6 @@ def main(DEBUG: bool) -> None:
         LOOKUP_TIMEOUT: float=5                                 # timeout for server lookup in seconds
 
         
-        logging.info("Refreshing presence...")
         minecraft_server_ip_port=settings["minecraft_server_ip"]
         if settings["minecraft_server_port"]!="":   # if port given in settings:
             minecraft_server_ip_port+=f":{settings['minecraft_server_port']}"
