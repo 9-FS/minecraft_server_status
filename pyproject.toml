@@ -1,11 +1,12 @@
 [tool.poetry]
-authors     = ["9FS <pray4spam@googlemail.com>"]
-description = ""
-license     = "MIT"
-name        = "x"
-readme      = "readme.md"
-repository  = "https://github.com/9-FS/2023-05-07-Minecraft-Server-Status-for-Discord"
-version     = "2.1.2"
+authors      = ["9FS <pray4spam@googlemail.com>"]
+description  = ""
+license      = "MIT"
+name         = ""
+package-mode = false                                                                    # this is an application, not library
+readme       = "readme.md"
+repository   = "https://github.com/9-FS/2023-05-07-Minecraft-Server-Status-for-Discord"
+version      = "2.1.2"
 
 [tool.poetry.dependencies]
 aiohttp   = "^3.8.5"
