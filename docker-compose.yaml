@@ -1,0 +1,18 @@
+version: "3"
+services:
+  2023-05-07-minecraft-server-status-for-discord:
+    container_name: 2023-05-07-Minecraft-Server-Status-for-Discord
+    image: 9-fs/2023-05-07-minecraft-server-status-for-discord:latest
+    environment:
+      - HOST_OS=Unraid
+      - TZ=UTC
+    volumes:
+      - /mnt/user/appdata/2023-05-07-minecraft-server-status-for-discord/config/:/app/config/:rw
+      - /mnt/user/appdata/2023-05-07-minecraft-server-status-for-discord/log/:/app/log/:rw
+    network_mode: bridge
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    user: 99:100
+networks: {}

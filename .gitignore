@@ -9,5 +9,4 @@ doc_templates/
 config/
 log/
 
-Dockerfile
 tests/test.py
