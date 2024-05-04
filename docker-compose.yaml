@@ -1,4 +1,5 @@
 version: "3"
+
 services:
   2023-05-07-minecraft-server-status-for-discord:
     container_name: 2023-05-07-Minecraft-Server-Status-for-Discord
@@ -15,4 +16,5 @@ services:
         limits:
           memory: 1G
     user: 99:100
+    
 networks: {}
