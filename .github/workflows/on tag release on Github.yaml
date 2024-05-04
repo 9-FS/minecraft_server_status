@@ -1,7 +1,9 @@
-name: On Tag Release on Github
+name: On Tag Deploy on Github
 env:
   PROJECT_NAME: Minecraft Server Status for Discord
-  PYTHON_VERSION: ^3.11.0
+  PYTHON_VERSION: ^3.12.0
+  REPO_NAME: 2023-05-07-Minecraft-Server-Status-for-Discord
+  RUN_TESTS: false
 on:
   push: 
     tags:
@@ -64,12 +66,13 @@ jobs:
             exit 1
           fi
       
-      # - name: Run Tests
-      #   run: poetry run pytest
+      - name: Run Tests
+        if: ${{env.RUN_TESTS=='true'}}
+        run: poetry run pytest
 
 
   create_release:
-    name: Create Release
+    name: Create Release on Github
     env:
       working-directory: ${{github.workspace}}
     needs: [datetime, test]
@@ -105,3 +108,170 @@ jobs:
           prerelease: false
           release_name: ${{needs.datetime.outputs.TODAY}} ${{env.PROJECT_NAME}} ${{github.ref}} # release title
           tag_name: ${{github.ref}}                                                             # release tag
+
+    outputs:
+      github_release: ${{steps.create_release.outputs.upload_url}}
+
+
+  build_executables:
+    name: Build Executable for ${{matrix.os}}
+    env:
+      working-directory: ${{github.workspace}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4 # makes repository structure available
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{env.PYTHON_VERSION}}
+      
+      - name: Update Pip
+        run: pip install --upgrade pip
+      
+      - name: Install Poetry
+        run: |
+          pip install poetry 
+          poetry config virtualenvs.in-project true
+          poetry config repositories.test-pypi https://test.pypi.org/legacy/
+          poetry install
+
+      - name: Install Pyinstaller
+        run: poetry run pip install pyinstaller # not `poetry add pyinstaller` because poetry will complain about pyinstaller's python dependency not being met
+
+      - name: Create "./dist/" Directory
+        run: mkdir -p "./dist/"
+      
+      - name: Compile
+        run: poetry run pyinstaller --onefile "./src/main_outer.py" --clean --name "program"
+      
+      - name: Cache Ubuntu Executable
+        if: ${{matrix.os=='ubuntu-latest'}}
+        uses: actions/cache/save@v3
+        with:
+          key: program.sh
+          path: ./dist/program
+
+      - name: Cache Windows Executable
+        if: ${{matrix.os=='windows-latest'}}
+        uses: actions/cache/save@v3
+        with:
+          key: program.exe
+          path: ./dist/program.exe
+
+
+  build_docker_image:
+    name: Build Docker Image
+    env:
+      working-directory: ${{github.workspace}}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4 # makes repository structure available
+
+      - name: Install Docker
+        uses: docker/setup-buildx-action@v1
+      
+      - name: Create "./dist/" Directory
+        run: mkdir -p "./dist/"
+      
+      - name: Compile
+        run: IMAGE_NAME="9-FS/${{env.REPO_NAME}}:latest" && docker build -t "${IMAGE_NAME@L}" --no-cache .
+        
+      - name: Save Docker Image
+        run: IMAGE_NAME="9-FS/${{env.REPO_NAME}}:latest" && docker save "${IMAGE_NAME@L}" > "./dist/docker-image.tar"
+      
+      - name: Cache Docker Image
+        uses: actions/cache/save@v3
+        with:
+          key: docker-image.tar
+          path: ./dist/docker-image.tar
+
+
+  deploy_executables:
+    name: Deploy Executable for ${{matrix.os}} on Github
+    env:
+      working-directory: ${{github.workspace}}
+    needs: [build_executables, create_release, datetime, test]
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Load Ubuntu Executable
+      if: ${{matrix.os=='ubuntu-latest'}}
+      uses: actions/cache/restore@v3
+      with:
+        key: program.sh
+        path: ./dist/program
+    
+    - name: Load Windows Executable
+      if: ${{matrix.os=='windows-latest'}}
+      uses: actions/cache/restore@v3
+      with:
+        key: program.exe
+        path: ./dist/program.exe
+      
+    - name: Parse Tag
+      id: parse_tag
+      run: echo "tag=${GITHUB_REF#refs/tags/*}" >> $GITHUB_OUTPUT # parse tag because github.ref provides tag as f"refs/tags/{tag}", in create_release it is parsed automatically idk
+      shell: bash                                                 # must be bash even on windows, because command to apply value to variable works differently in powershell
+    
+    - name: Attach Ubuntu Executable to Release
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      if: ${{matrix.os=='ubuntu-latest'}}
+      uses: actions/upload-release-asset@v1
+      with:
+        asset_content_type: application
+        asset_name: ${{needs.datetime.outputs.TODAY}} ${{env.PROJECT_NAME}} ${{steps.parse_tag.outputs.tag}}.sh
+        asset_path: ./dist/program
+        upload_url: ${{needs.create_release.outputs.github_release}}
+    
+    - name: Attach Windows Executable to Release
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      if: ${{matrix.os=='windows-latest'}}
+      uses: actions/upload-release-asset@v1
+      with:
+        asset_content_type: application
+        asset_name: ${{needs.datetime.outputs.TODAY}} ${{env.PROJECT_NAME}} ${{steps.parse_tag.outputs.tag}}.exe
+        asset_path: ./dist/program.exe
+        upload_url: ${{needs.create_release.outputs.github_release}}
+
+
+  deploy_docker_image:
+    name: Deploy Docker Image on Github
+    env:
+      working-directory: ${{github.workspace}}
+    needs: [build_docker_image, create_release, datetime, test]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Load Docker Image
+      uses: actions/cache/restore@v3
+      with:
+        key: docker-image.tar
+        path: ./dist/docker-image.tar
+      
+    - name: Parse Tag
+      id: parse_tag
+      run: echo "tag=${GITHUB_REF#refs/tags/*}" >> $GITHUB_OUTPUT # parse tag because github.ref provides tag as f"refs/tags/{tag}", in create_release it is parsed automatically idk
+      shell: bash                                                 # must be bash even on windows, because command to apply value to variable works differently in powershell
+    
+    - name: Attach Docker Image to Release
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      uses: actions/upload-release-asset@v1
+      with:
+        asset_content_type: application
+        asset_name: ${{needs.datetime.outputs.TODAY}} ${{env.PROJECT_NAME}} ${{steps.parse_tag.outputs.tag}}.tar
+        asset_path: ./dist/docker-image.tar
+        upload_url: ${{needs.create_release.outputs.github_release}}
