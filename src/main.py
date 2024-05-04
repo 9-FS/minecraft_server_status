@@ -1,4 +1,4 @@
-# Copyright (c) 2023 구FS, all rights reserved. Subject to the MIT licence in `licence.md`.
+# Copyright (c) 2024 구FS, all rights reserved. Subject to the MIT licence in `licence.md`.
 import aiohttp.client_exceptions
 import discord, discord.ext.commands, discord.ext.tasks
 import dns.exception
