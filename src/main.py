@@ -2,41 +2,41 @@
 import aiohttp.client_exceptions
 import discord, discord.ext.commands, discord.ext.tasks
 import dns.exception
-import json
 from KFSconfig import KFSconfig
 from KFSfstr   import KFSfstr
 from KFSlog    import KFSlog
 import logging
 import mcstatus, mcstatus.pinger
 import time
+import typing
 from convert_to_ip_public import convert_to_ip_public
 
 
-@KFSlog.timeit
+@KFSlog.timeit()
 def main(DEBUG: bool) -> None:
     discord_bot: discord.ext.commands.Bot   # discord bot instance    
     intents: discord.Intents                # bot permissions
-    settings: dict                          # settings, loaded from settings.json
-    SETTINGS_DEFAULT: str=json.dumps({      # settings default
-        "discord_bot_channel_name": "",     # channel to monitor for IP command
-        "discord_bot_token": "",            # discord bot token
-        "convert_to_ip_public": False,      # if true, convert given server IP or domain to public IP
-        "ip_public_version": 4,             # if convert_to_ip_public is true, use IPv4 or IPv6
-        "minecraft_server_ip": "",          # minecraft server IP or domain, do not add port here
-        "minecraft_server_port": "",        # minecraft server port, may be left empty
-        "refresh_frequency": 200e-3,        # refresh display with 200mHz (every 5s)
-    }, indent=4)
+    config: dict[str, typing.Any]           # config
+    CONFIG_DEFAULT: dict[str, typing.Any]=\
+    {
+        "CONVERT_TO_IP_PUBLIC": False,      # if true, convert given server IP or domain to public IP
+        "IP_PUBLIC_VERSION": 4,             # if convert_to_ip_public is true, use IPv4 or IPv6
+        "REFRESH_FREQUENCY": 200e-3,        # refresh display with 200mHz (every 5s)
+    }
+    env: dict[str, str]                     # environment variables
+    ENV_DEFAULT: dict[str, str]=\
+    {
+        "DISCORD_BOT_CHANNEL_NAME": "bots", # channel to monitor for IP command
+        "DISCORD_BOT_TOKEN": "",            # discord bot token
+        "MINECRAFT_SERVER_IP": "",          # minecraft server IP or domain, do not add port here
+        "MINECRAFT_SERVER_PORT": "",        # minecraft server port, may be left empty
+    }
     
 
     try:
-        settings=json.loads(KFSconfig.load_config("./config/settings.json", SETTINGS_DEFAULT))  # load settings
-    except FileNotFoundError:
-        return
-    if settings["discord_bot_token"]=="":
-        logging.critical("discord_bot_token must be set in ./config/settings.json. If you don't know how to do that, refer to: https://www.writebots.com/discord-bot-token/")
-        return
-    if settings["minecraft_server_ip"]=="":
-        logging.critical("minecraft_server_ip must be set in ./config/settings.json.")
+        config=KFSconfig.load_config(env=False, config_filepaths=["./config/config.json"], config_default=CONFIG_DEFAULT)   # load configuration
+        env   =KFSconfig.load_config(           config_filepaths=["./.env"],               config_default=ENV_DEFAULT)      # load environment variables
+    except ValueError:
         return
     intents=discord.Intents.default()                                           # standard permissions
     intents.message_content=True                                                # in addition with message contents
@@ -49,7 +49,7 @@ def main(DEBUG: bool) -> None:
         logging.info("Started discord bot.")
         return
 
-    @discord.ext.tasks.loop(seconds=1/settings["refresh_frequency"])
+    @discord.ext.tasks.loop(seconds=1/config["REFRESH_FREQUENCY"])
     async def refresh(discord_bot: discord.ext.commands.Bot) -> None:    # refresh display regurarily
         """
         Refreshes bot presence with current number of players online, maximum number of players, player names, and server IP. Also sets status to online or offline as appropiate.
@@ -64,9 +64,9 @@ def main(DEBUG: bool) -> None:
         LOOKUP_TIMEOUT: float=5                                 # timeout for server lookup in seconds
 
         
-        minecraft_server_ip_port=settings["minecraft_server_ip"]
-        if settings["minecraft_server_port"]!="":   # if port given in settings:
-            minecraft_server_ip_port+=f":{settings['minecraft_server_port']}"
+        minecraft_server_ip_port=env["MINECRAFT_SERVER_IP"]
+        if env["MINECRAFT_SERVER_PORT"]!="":    # if port given in settings:
+            minecraft_server_ip_port+=f":{env["MINECRAFT_SERVER_PORT"]}"
 
         logging.info(f"Looking up \"{minecraft_server_ip_port}\"...")
         try:
@@ -97,13 +97,13 @@ def main(DEBUG: bool) -> None:
                 discord_status=discord.Status.online                                                                                                        # status green
         
 
-        if settings["convert_to_ip_public"]==True:                                      # if convert to public IP: convert
-            minecraft_server_display_ip_port=convert_to_ip_public(settings["minecraft_server_ip"], settings["ip_public_version"])
-        else:                                                                           # else: use given IP or domain
-            minecraft_server_display_ip_port=settings["minecraft_server_ip"]
-        if settings["minecraft_server_port"]!="":                                       # if port given in settings:
-            minecraft_server_display_ip_port+=f": {settings['minecraft_server_port']}"  # append port, space before port for linebreak
-        discord_presence_title+=f"; IP: {minecraft_server_display_ip_port}"             # append IP
+        if config["CONVERT_TO_IP_PUBLIC"]==True:                                    # if convert to public IP: convert
+            minecraft_server_display_ip_port=convert_to_ip_public(env["MINECRAFT_SERVER_IP"], config["IP_PUBLIC_VERSION"])
+        else:                                                                       # else: use given IP or domain
+            minecraft_server_display_ip_port=env["MINECRAFT_SERVER_IP"]
+        if env["MINECRAFT_SERVER_PORT"]!="":                                        # if port given in settings:
+            minecraft_server_display_ip_port+=f": {env["MINECRAFT_SERVER_PORT"]}"   # append port, space before port for linebreak
+        discord_presence_title+=f"; IP: {minecraft_server_display_ip_port}"         # append IP
 
         logging.info(f"Applying presence title \"{discord_presence_title}\" and bot status \"{discord_status.name}\"...")
         try:
@@ -128,18 +128,18 @@ def main(DEBUG: bool) -> None:
 
 
         if(   message.author==discord_bot.user  # if message from bot itself or outside dedicated bot channel or not the right command: do nothing 
-           or message.channel.name!=settings["discord_bot_channel_name"]    # type:ignore
+           or message.channel.name!=env["DISCORD_BOT_CHANNEL_NAME"]    # type:ignore
            or message.content.casefold()!="ip"):
             return
         
 
         logging.info("Executing IP command...")
-        if settings["convert_to_ip_public"]==True:  # if convert to public IP: convert
-            message_send=convert_to_ip_public(settings["minecraft_server_ip"], settings["ip_public_version"])
+        if config["CONVERT_TO_IP_PUBLIC"]==True:    # if convert to public IP: convert
+            message_send=convert_to_ip_public(env["MINECRAFT_SERVER_IP"], config["IP_PUBLIC_VERSION"])
         else:                                       # else: use IP or domain given
-            message_send=settings["minecraft_server_ip"]
-        if settings["minecraft_server_port"]!="":   # if port given in settings:
-            message_send+=f":{settings['minecraft_server_port']}"
+            message_send=env["MINECRAFT_SERVER_IP"]
+        if env["MINECRAFT_SERVER_PORT"]!="":        # if port given in settings:
+            message_send+=f":{env["MINECRAFT_SERVER_PORT"]}"
 
         logging.info(f"Sending message \"{message_send}\" to discord...")
         try:
@@ -155,7 +155,7 @@ def main(DEBUG: bool) -> None:
     while True:
         logging.info("Starting discord bot...")
         try:
-            discord_bot.run(settings["discord_bot_token"])                          # start discord bot now
+            discord_bot.run(env["DISCORD_BOT_TOKEN"])                               # start discord bot now
         except (aiohttp.client_exceptions.ClientConnectorError, RuntimeError) as e: # if internet connection fails: retry connection
             logging.error(f"Starting discord bot failed with {KFSfstr.full_class_name(e)}. Error: {e.args}\nRetrying in 10s...")
             time.sleep(10)
