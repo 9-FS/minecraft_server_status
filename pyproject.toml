@@ -3,9 +3,9 @@ authors      = ["9FS <pray4spam@googlemail.com>"]
 description  = ""
 license      = "MIT"
 name         = ""
-package-mode = false                                                                    # this is an application, not library
-readme       = "readme.md"
-repository   = "https://github.com/9-FS/2023-05-07-Minecraft-Server-Status-for-Discord"
+package-mode = false                                             # this is an application, not library
+readme       = "readme.typ"
+repository   = "https://github.com/9-FS/minecraft_server_status"
 version      = "2.2.0"
 
 [tool.poetry.dependencies]
