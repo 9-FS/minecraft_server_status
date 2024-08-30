@@ -1,0 +1,32 @@
+[package]
+authors     = ["9-FS <pray4spam@googlemail.com>"]
+categories  = []
+description = ""
+edition     = "2021"
+exclude     = [".github/", "readme.pdf"]                        # additional to .gitignore
+keywords    = []
+license     = "MIT"
+name        = "minecraft_server_status"
+readme      = "readme.md"
+repository  = "https://github.com/9-FS/minecraft_server_status"
+version     = "3.0.0"
+
+[dependencies]
+async-minecraft-ping = "^0.8.0"
+figment              = { version = "^0.10.0", optional = true }
+log                  = "^0.4.0"
+scaler               = "^1.0.0"
+serde                = { version = "^1.0.0", optional = true }
+serde_json           = { version = "^1.0.0", optional = true }
+serde_yaml           = { version = "^0.9.0", optional = true }
+serenity             = "^0.12.0"
+setup_logging        = { git = "https://github.com/9-FS/setup_logging", tag = "2.1.0" }
+tokio                = { version = "^1.40.0", features = ["full"] }
+toml                 = { version = "^0.8.0", optional = true }
+
+[features]
+default          = ["load_toml_config"]
+load_config      = ["figment/env", "serde/derive"]
+load_json_config = ["figment/json", "load_config", "serde_json"]
+load_toml_config = ["figment/toml", "load_config", "toml"]
+load_yaml_config = ["figment/yaml", "load_config", "serde_yaml"]

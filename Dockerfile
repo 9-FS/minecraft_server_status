@@ -1,25 +1,22 @@
-ARG PYTHON_VERSION="3.12"
-FROM python:$PYTHON_VERSION
+ARG RUST_VERSION="1.80"
+FROM rust:$RUST_VERSION
 
-ENV PYTHON_VERSION="3.12"
+ENV RUST_VERSION="1.80"
 
 
 WORKDIR "/app/"
 COPY . .
 
-RUN python${PYTHON_VERSION} -m pip install poetry
-RUN poetry config virtualenvs.in-project true
-RUN poetry config repositories.test-pypi "https://test.pypi.org/legacy/"
-RUN poetry install
+RUN cargo build --release
 
 
-CMD poetry run python${PYTHON_VERSION} "./src/main_outer.py"
+CMD "./target/release/minecraft_server_status"
 
 
 # MANUAL BUILD:
 
 # build docker image, save in tar, remove image so only tar remains, @L to lowercase
-# IMAGE_NAME="9-FS/2023-05-07-Minecraft-Server-Status-for-Discord:latest" && docker build -t "${IMAGE_NAME@L}" --no-cache . && docker save "${IMAGE_NAME@L}" > "docker-image.tar" && docker rmi "${IMAGE_NAME@L}"
+# IMAGE_NAME="9-FS/minecraft_server_status:latest" && docker build -t "${IMAGE_NAME@L}" --no-cache . && docker save "${IMAGE_NAME@L}" > "docker-image.tar" && docker rmi "${IMAGE_NAME@L}"
 
 # on deployment environment load docker image from tar file
 # docker load < "/mnt/user/appdata/docker-image.tar"

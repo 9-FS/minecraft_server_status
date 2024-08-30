@@ -1,14 +1,11 @@
 *.exe
 *.log
-*.pyc
 *.token
 
-.hypothesis/
-.pytest_cache/
 config/
 doc_templates/
 log/
+target/
 
-.env
 docker-image.tar
-tests/test.py
+rustfmt.toml
