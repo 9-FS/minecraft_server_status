@@ -1,3 +1,6 @@
+// Copyright (c) 2024 구FS, all rights reserved. Subject to the MIT licence in `licence.md`.
+
+
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum DomainOrIp
 {

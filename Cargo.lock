@@ -302,8 +302,6 @@ dependencies = [
  "atomic",
  "pear",
  "serde",
- "serde_json",
- "serde_yaml",
  "toml",
  "uncased",
  "version_check",
@@ -652,6 +650,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8adc4bb1803a324070e64a98ae98f38934d91957a99cfb3a43dcbc01bc56439"
 
 [[package]]
+name = "load_config"
+version = "1.0.0"
+source = "git+https://github.com/9-FS/load_config?tag=1.0.0#98599929a717723696b4ee7ea6b648d4b746f38e"
+dependencies = [
+ "figment",
+ "log",
+ "serde",
+ "toml",
+]
+
+[[package]]
 name = "log"
 version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -681,19 +690,16 @@ dependencies = [
 
 [[package]]
 name = "minecraft_server_status"
-version = "3.0.0"
+version = "3.0.1"
 dependencies = [
  "async-minecraft-ping",
- "figment",
+ "load_config",
  "log",
  "scaler",
  "serde",
- "serde_json",
- "serde_yaml",
  "serenity",
  "setup_logging",
  "tokio",
- "toml",
 ]
 
 [[package]]
@@ -1095,19 +1101,6 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "serde_yaml"
-version = "0.9.34+deprecated"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47"
-dependencies = [
- "indexmap",
- "itoa",
- "ryu",
- "serde",
- "unsafe-libyaml",
 ]
 
 [[package]]
@@ -1533,12 +1526,6 @@ name = "unicode-segmentation"
 version = "1.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d4c87d22b6e3f4a18d4d40ef354e97c90fcb14dd91d7dc0aa9d8a1172ebf7202"
-
-[[package]]
-name = "unsafe-libyaml"
-version = "0.2.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
 
 [[package]]
 name = "untrusted"
