@@ -9,7 +9,7 @@ license     = "MIT"
 name        = "minecraft_server_status"
 readme      = "readme.md"
 repository  = "https://github.com/9-FS/minecraft_server_status"
-version     = "3.0.1"
+version     = "3.0.2"
 
 [dependencies]
 async-minecraft-ping = "^0.8.0"

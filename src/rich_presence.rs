@@ -132,7 +132,7 @@ async fn generate_rich_presence(
     {
         player_names = mc_server.status.players.sample.unwrap_or_default().iter().map(|player| player.name.clone()).collect(); // get player names
         player_names.sort_by_key(|player_name| player_name.to_lowercase()); // sort player names case insensitive
-        discord_rich_presence += format!(": {}", player_names.join(",").as_str()).as_str();
+        discord_rich_presence += format!(": {}", player_names.join(", ").as_str()).as_str();
         // collapse player name list into string, append to rich presence
     }
 
