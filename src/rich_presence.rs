@@ -56,8 +56,7 @@ async fn manage_rich_presence(ctx: serenity::all::Context, mc_server_domain_or_i
 
     loop
     {
-        match generate_rich_presence(mc_server_domain_or_ip.clone(), mc_server_port, mc_server_address.as_str()).await
-        // refresh rich presence
+        match generate_rich_presence(mc_server_domain_or_ip.clone(), mc_server_port, mc_server_address.as_str()).await // refresh rich presence
         {
             Ok(o)=>
             {
@@ -73,12 +72,10 @@ async fn manage_rich_presence(ctx: serenity::all::Context, mc_server_domain_or_i
             }
         }
 
-        log::info!("Applying presence title \"{}\" and bot status \"{:?}\"...", discord_presence_title, discord_status);
         ctx.set_presence(Some(serenity::all::ActivityData::custom(discord_presence_title.clone())), discord_status); // set discord bot status
-        log::info!("\rApplied presence title \"{}\" and bot status \"{:?}\".", discord_presence_title, discord_status);
+        log::info!("Applied presence title \"{}\" and bot status \"{:?}\".", discord_presence_title, discord_status);
 
-        tokio::time::sleep(std::time::Duration::from_secs(refresh_interval)).await;
-        // sleep for interval seconds
+        tokio::time::sleep(std::time::Duration::from_secs(refresh_interval)).await; // sleep for interval seconds
     }
 }
 
@@ -94,11 +91,7 @@ async fn manage_rich_presence(ctx: serenity::all::Context, mc_server_domain_or_i
 /// # Returns
 /// - `Ok((discord_status, discord_rich_presence))`: discord bot status and discord rich presence
 /// - `Err(e)`: error
-async fn generate_rich_presence(
-    mc_server_domain_or_ip: DomainOrIp,
-    mc_server_port: Option<u16>,
-    mc_server_address: &str,
-) -> Result<(serenity::model::user::OnlineStatus, String), async_minecraft_ping::ServerError>
+async fn generate_rich_presence(mc_server_domain_or_ip: DomainOrIp, mc_server_port: Option<u16>, mc_server_address: &str) -> Result<(serenity::model::user::OnlineStatus, String), async_minecraft_ping::ServerError>
 {
     let mut discord_rich_presence: String; // discord rich presence, ip address or domain and list of online players
     let discord_status: serenity::model::user::OnlineStatus; // discord bot status, online, offline, etc.
@@ -110,30 +103,25 @@ async fn generate_rich_presence(
 
 
     mc_server_config = async_minecraft_ping::ConnectionConfig::build(mc_server_domain_or_ip); // set domain or ip
-    if let Some(port) = mc_server_port
-    // if port given: set
+    if let Some(port) = mc_server_port // if port given: set
     {
         mc_server_config = mc_server_config.with_port(port);
     }
 
-    log::info!("Connecting to minecraft server at {mc_server_address}...");
     let mc_server: async_minecraft_ping::StatusConnection = mc_server_config.connect().await?; // connect to server, ConnectionConfig -> StatusConnection
-    log::info!("\rConnected to minecraft server at {mc_server_address}.");
+    log::info!("Connected to minecraft server at {mc_server_address}.");
 
-    log::info!("Fetching status from minecraft server at {mc_server_address}...");
     let mc_server = mc_server.status().await?; // request data, StatusConnection -> PingConnection
-    log::info!("\rFetched status from minecraft server at {mc_server_address}.");
+    log::info!("Fetched status from minecraft server at {mc_server_address}.");
 
     discord_status = serenity::model::user::OnlineStatus::Online; // set status online
 
     discord_rich_presence = format!("{}/{}; {mc_server_address}", f.format(mc_server.status.players.online), f.format(mc_server.status.players.max)); // set online presence
-    if 1 <= mc_server.status.players.online
-    // if players online: add player list
+    if 1 <= mc_server.status.players.online // if players online: add player list
     {
         player_names = mc_server.status.players.sample.unwrap_or_default().iter().map(|player| player.name.clone()).collect(); // get player names
         player_names.sort_by_key(|player_name| player_name.to_lowercase()); // sort player names case insensitive
-        discord_rich_presence += format!(": {}", player_names.join(", ").as_str()).as_str();
-        // collapse player name list into string, append to rich presence
+        discord_rich_presence += format!(": {}", player_names.join(", ").as_str()).as_str(); // collapse player name list into string, append to rich presence
     }
 
     return Ok((discord_status, discord_rich_presence));

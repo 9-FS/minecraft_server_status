@@ -4,7 +4,7 @@ use crate::domain_or_ip::*;
 
 /// # Summary
 /// Collection of settings making up the configuration of the application.
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[allow(non_snake_case)]
 pub struct Config
 {

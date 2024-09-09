@@ -2,6 +2,8 @@
 mod config;
 use config::*;
 mod domain_or_ip;
+mod error;
+use error::*;
 mod main_inner;
 use main_inner::*;
 mod rich_presence;
@@ -49,7 +51,22 @@ fn main() -> std::process::ExitCode
 
     match std::panic::catch_unwind(|| tokio_rt.block_on(main_inner(config))) // execute main_inner, catch panic
     {
-        Ok(_) => {return std::process::ExitCode::SUCCESS;} // no panic, program executed successfully
-        Err(_) => {return std::process::ExitCode::FAILURE;} // panic, program failed
+        Ok(result) => // no panic
+        {
+            match result
+            {
+                Ok(()) => {return std::process::ExitCode::SUCCESS;} // program executed successfully
+                Err(e) => // program failed in a controlled manner
+                {
+                    match e // log error
+                    {
+                        Error::Serenity(e) => log::error!("Starting discord bot failed with: {e}"),
+                        Error::SettingInvalid {name, value, reason} => log::error!("Setting {name} has invalid value \"{value}\", reason: {reason}"),
+                    }
+                    return std::process::ExitCode::FAILURE;
+                }
+            }
+        }
+        Err(_) => {return std::process::ExitCode::FAILURE;} // program crashed with panic, dis not good
     };
 }
