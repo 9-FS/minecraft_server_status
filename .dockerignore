@@ -2,10 +2,11 @@
 *.log
 *.token
 
-config/
-doc_templates/
-log/
-target/
+/config/
+/db/
+/doc_templates/
+/log/
+/target/
 
 docker-image.tar
 rustfmt.toml
