@@ -14,8 +14,8 @@ CMD ["./minecraft_server_status"]
 
 # MANUAL BUILD:
 
-# build docker image, save in tar, remove image so only tar remains, @L to lowercase
-# IMAGE_NAME="9-FS/minecraft_server_status:latest" && docker build -t "${IMAGE_NAME@L}" --no-cache . && docker save "${IMAGE_NAME@L}" > "docker-image.tar" && docker rmi "${IMAGE_NAME@L}"
+# build docker image, save in tar, remove image so only tar remains
+# docker build -t "9-fs/minecraft_server_status:latest" --no-cache . && docker save "9-fs/minecraft_server_status:latest" > "docker-image.tar" && docker rmi "9-fs/minecraft_server_status:latest"
 
 # on deployment environment load docker image from tar file
 # docker load < "/mnt/user/appdata/docker-image.tar"
