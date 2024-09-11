@@ -4,7 +4,7 @@ use crate::error::*;
 use crate::rich_presence::*;
 
 
-pub async fn main_inner(config: Config) -> Result<()>
+pub async fn main_inner(config: Config) -> Result<(), Error>
 {
     let mut discord_bot: serenity::Client; // discord bot
 
@@ -14,7 +14,7 @@ pub async fn main_inner(config: Config) -> Result<()>
         .await
     {
         Ok(o) => discord_bot = o, // created discord bot successfully
-        Err(e) => {return Err(Error::SettingInvalid { name: "DISCORD_BOT_TOKEN".to_owned(), value: config.DISCORD_BOT_TOKEN, reason: e.to_string()});} // creating discord bot failed
+        Err(e) => {return Err(Error::SettingInvalid {name: "DISCORD_BOT_TOKEN".to_owned(), value: config.DISCORD_BOT_TOKEN, reason: e.to_string()});} // creating discord bot failed
     }
 
 

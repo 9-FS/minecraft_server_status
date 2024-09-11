@@ -7,9 +7,6 @@ pub enum Error
     #[error("Setting {name} has invalid value \"{value}\", reason: {reason}")]
     SettingInvalid {name: String, value: String, reason: String},
 
-    #[error(transparent)]
+    #[error("Starting discord bot failed with: {0}")]
     Serenity(#[from] serenity::Error),
 }
-
-
-pub type Result<T> = std::result::Result<T, Error>; // strict error handling, only takes pre defined Error type

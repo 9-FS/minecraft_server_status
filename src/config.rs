@@ -8,6 +8,7 @@ use crate::domain_or_ip::*;
 #[allow(non_snake_case)]
 pub struct Config
 {
+    pub DEBUG: Option<bool>, // debug mode?
     pub DISCORD_BOT_TOKEN: String, // discord bot token
     pub MINECRAFT_SERVER_DOMAIN_OR_IP: DomainOrIp, // minecraft server domain or ip, do not add port here
     pub MINECRAFT_SERVER_PORT: Option<u16>, // minecraft server port, optional
@@ -20,6 +21,7 @@ impl Default for Config
     {
         Config
         {
+            DEBUG: None, // no entry in default config, defaults to false
             DISCORD_BOT_TOKEN: "".to_owned(),
             MINECRAFT_SERVER_DOMAIN_OR_IP: DomainOrIp::Domain("".to_owned()),
             MINECRAFT_SERVER_PORT: Some(25565),
