@@ -645,8 +645,8 @@ checksum = "d8adc4bb1803a324070e64a98ae98f38934d91957a99cfb3a43dcbc01bc56439"
 
 [[package]]
 name = "load_config"
-version = "1.1.0"
-source = "git+https://github.com/9-FS/load_config?tag=1.1.0#1705c7fc0f0cfc6bd42cde1a3a6867fac65ee332"
+version = "1.1.1"
+source = "git+https://github.com/9-FS/load_config?tag=1.1.1#b32327108d4ed68c07604dcf954c5d6fc969d75b"
 dependencies = [
  "figment",
  "serde",
@@ -684,7 +684,7 @@ dependencies = [
 
 [[package]]
 name = "minecraft_server_status"
-version = "3.2.0"
+version = "3.2.1"
 dependencies = [
  "async-minecraft-ping",
  "load_config",
@@ -1119,8 +1119,8 @@ dependencies = [
 
 [[package]]
 name = "setup_logging"
-version = "2.1.0"
-source = "git+https://github.com/9-FS/setup_logging?tag=2.1.0#692cfdcb6422427e55d04170b065f7c0dd5bad95"
+version = "2.1.1"
+source = "git+https://github.com/9-FS/setup_logging?tag=2.1.1#2eb6368acfd01126be1aa5c88685c7ea1d4f75ee"
 dependencies = [
  "chrono",
  "fern",
@@ -1494,9 +1494,9 @@ checksum = "08f95100a766bf4f8f28f90d77e0a5461bbdb219042e7679bebe79004fed8d75"
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.12"
+version = "1.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+checksum = "e91b56cd4cadaeb79bbf1a5645f6b4f8dc5bde8834ad5894a8db35fda9efa1fe"
 
 [[package]]
 name = "unicode-normalization"
@@ -1509,9 +1509,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-segmentation"
-version = "1.11.0"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4c87d22b6e3f4a18d4d40ef354e97c90fcb14dd91d7dc0aa9d8a1172ebf7202"
+checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
 
 [[package]]
 name = "untrusted"
