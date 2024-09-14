@@ -645,8 +645,8 @@ checksum = "d8adc4bb1803a324070e64a98ae98f38934d91957a99cfb3a43dcbc01bc56439"
 
 [[package]]
 name = "load_config"
-version = "1.1.1"
-source = "git+https://github.com/9-FS/load_config?tag=1.1.1#b32327108d4ed68c07604dcf954c5d6fc969d75b"
+version = "1.1.2"
+source = "git+https://github.com/9-FS/load_config?tag=1.1.2#e6b732da500ab9a38a76a4ecc3b647b15ffc45b9"
 dependencies = [
  "figment",
  "serde",
@@ -684,7 +684,7 @@ dependencies = [
 
 [[package]]
 name = "minecraft_server_status"
-version = "3.2.1"
+version = "3.2.2"
 dependencies = [
  "async-minecraft-ping",
  "load_config",
@@ -744,9 +744,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.19.0"
+version = "1.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
+checksum = "33ea5043e58958ee56f3e15a90aee535795cd7dfd319846288d93c5b57d85cbe"
 
 [[package]]
 name = "pear"
