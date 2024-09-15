@@ -645,8 +645,8 @@ checksum = "d8adc4bb1803a324070e64a98ae98f38934d91957a99cfb3a43dcbc01bc56439"
 
 [[package]]
 name = "load_config"
-version = "1.1.2"
-source = "git+https://github.com/9-FS/load_config?tag=1.1.2#e6b732da500ab9a38a76a4ecc3b647b15ffc45b9"
+version = "1.2.0"
+source = "git+https://github.com/9-FS/load_config?tag=1.2.0#19c4d4fc2bdc6da865c5e147815c0cabaf469995"
 dependencies = [
  "figment",
  "serde",
@@ -684,7 +684,7 @@ dependencies = [
 
 [[package]]
 name = "minecraft_server_status"
-version = "3.2.2"
+version = "3.2.3"
 dependencies = [
  "async-minecraft-ping",
  "load_config",

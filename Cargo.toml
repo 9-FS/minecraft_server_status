@@ -9,11 +9,11 @@ license     = "MIT"
 name        = "minecraft_server_status"
 readme      = "readme.md"
 repository  = "https://github.com/9-FS/minecraft_server_status"
-version     = "3.2.2"
+version     = "3.2.3"
 
 [dependencies]
 async-minecraft-ping = "^0.8.0"
-load_config = { git = "https://github.com/9-FS/load_config", tag = "1.1.2", features = [
+load_config = { git = "https://github.com/9-FS/load_config", tag = "1.2.0", features = [
     "toml_file",
 ] }
 log = "^0.4.0"
