@@ -12,7 +12,7 @@ impl RichPresenceHandler
 {
     pub fn new(config: Config) -> Self
     {
-        return RichPresenceHandler { config: config };
+        return RichPresenceHandler {config};
     }
 }
 
