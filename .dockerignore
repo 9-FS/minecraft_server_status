@@ -9,4 +9,3 @@
 /target/
 
 docker-image.tar
-rustfmt.toml
