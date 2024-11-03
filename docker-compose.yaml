@@ -8,11 +8,9 @@ services:
         volumes:
             - "/mnt/user/appdata/minecraft_server_status/config/:/app/config/:rw"
             - "/mnt/user/appdata/minecraft_server_status/log/:/app/log/:rw"
+        user: "99:100"
         network_mode: "bridge"
         deploy:
             resources:
                 limits:
                     memory: "1G"
-        user: "99:100"
-
-networks: {}
