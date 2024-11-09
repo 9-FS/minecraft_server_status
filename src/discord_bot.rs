@@ -3,21 +3,21 @@ use crate::config::*;
 use crate::domain_or_ip::*;
 
 
-pub struct RichPresenceHandler
+pub struct DiscordBot
 {
     config: Config, // holds config
 }
 
-impl RichPresenceHandler
+impl DiscordBot
 {
     pub fn new(config: Config) -> Self
     {
-        return RichPresenceHandler {config};
+        return DiscordBot {config};
     }
 }
 
 #[serenity::async_trait]
-impl serenity::all::EventHandler for RichPresenceHandler
+impl serenity::all::EventHandler for DiscordBot
 {
     async fn ready(&self, ctx: serenity::all::Context, _: serenity::all::Ready) -> () // when bot is ready
     {

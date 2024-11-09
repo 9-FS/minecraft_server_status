@@ -1,7 +1,7 @@
 services:
     minecraft_server_status:
         container_name: "minecraft_server_status"
-        image: "ghcr.io/9-fs/minecraft_server_status:3.2.4"
+        image: "ghcr.io/9-fs/minecraft_server_status:3.2.5"
         environment:
             HOST_OS: "Unraid"
             TZ: "UTC"

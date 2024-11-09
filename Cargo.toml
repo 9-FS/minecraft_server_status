@@ -9,7 +9,7 @@ license     = "MIT"
 name        = "minecraft_server_status"
 readme      = "readme.md"
 repository  = "https://github.com/9-FS/minecraft_server_status"
-version     = "3.2.4"
+version     = "3.2.5"
 
 [dependencies]
 async-minecraft-ping = "^0.8.0"
@@ -26,7 +26,7 @@ serenity = { version = "^0.12.0", default-features = false, features = [
     "rustls_backend",
 ] }
 setup_logging = { git = "https://github.com/9-FS/setup_logging", tag = "2.1.1" }
-thiserror = "^1.0.0"
+thiserror = "^2.0.0"
 tokio = { version = "^1.0.0", features = ["rt-multi-thread"] }
 
 [lints.clippy]
