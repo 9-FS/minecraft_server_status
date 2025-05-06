@@ -1,3 +1,5 @@
+name: "minecraft_server_status"
+
 services:
     minecraft_server_status:
         container_name: "minecraft_server_status"
