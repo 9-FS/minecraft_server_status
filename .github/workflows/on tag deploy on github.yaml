@@ -2,7 +2,7 @@ name: "On Tag Deploy on GitHub"
 env:
     REPO_NAME: "minecraft_server_status"
     RUN_TESTS: true
-    RUST_VERSION: "1.85"
+    RUST_VERSION: "1.86"
 on:
     push:
         tags:

@@ -3,16 +3,8 @@ name: "minecraft_server_status"
 services:
     minecraft_server_status:
         container_name: "minecraft_server_status"
-        image: "ghcr.io/9-fs/minecraft_server_status:3.2.5"
-        environment:
-            HOST_OS: "Unraid"
-            TZ: "UTC"
+        image: "ghcr.io/9-fs/minecraft_server_status:latest"
+        mem_limit: "1G"
         volumes:
-            - "/mnt/user/appdata/minecraft_server_status/config/:/app/config/:rw"
-            - "/mnt/user/appdata/minecraft_server_status/log/:/app/log/:rw"
-        user: "99:100"
-        network_mode: "bridge"
-        deploy:
-            resources:
-                limits:
-                    memory: "1G"
+            - "/mnt/user/appdata/minecraft_server_status/config/:/app/config/"
+            - "/mnt/user/appdata/minecraft_server_status/log/:/app/log/"
