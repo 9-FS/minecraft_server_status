@@ -5,11 +5,11 @@ WORKDIR "/app/"
 COPY "." "."
 RUN cargo build --release
 
-FROM alpine
+FROM gcr.io/distroless/cc
 WORKDIR "/app/"
 COPY --from=builder "/app/target/release/minecraft_server_status" "."
 
-CMD ["./minecraft_server_status"]
+ENTRYPOINT ["./minecraft_server_status"]
 
 
 # MANUAL BUILD:
